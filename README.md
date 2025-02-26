@@ -1,3 +1,9 @@
+# IMPORTANT
+If using Ubuntu +23, you must add Chrome sandbox to AppArmor
+[Chromium Docs about AppArmor](https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md)
+
+I suggest you use option 3, the safest
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -6,3 +6,8 @@ export type SidebarRoute = {
     url: string,
     icon: LucideIcon|string
 }
+
+export type ScrapeResultType = {
+    screenshot?: string,
+    html?: string
+}

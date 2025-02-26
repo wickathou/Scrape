@@ -5,24 +5,55 @@ import { z } from 'zod'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+import { ScrapeResultType } from '@/lib/types'
 
 const formSchema = z.object({
     targetURL: z.string().url('Not valid URL')
 })
 
-export const URLForm = () => {
+
+
+interface ChildComponentProps {
+    scrapeResult: React.Dispatch<React.SetStateAction<ScrapeResultType>>;
+    setLoading:React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const URLForm: React.FC<ChildComponentProps> = ({ scrapeResult,setLoading }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues:
             { targetURL: '' }
     })
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        try {
+            setLoading(true)
+            const response = await fetch('/api/scrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ targetURL: values.targetURL }),
+            })
+            const result = await response.json()
+            if (result.success) {
+                console.log('Scraping successful:', result.data);
+                scrapeResult({
+                    screenshot: result.data.screenshot,
+                    html: result.data.html
+                })
+            } else {
+                console.error('Scraping failed:', result.error);
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} onReset={()=>form.reset()}>
+            <form onSubmit={form.handleSubmit(onSubmit)} onReset={() => form.reset()}>
                 <FormField
                     control={form.control}
                     name='targetURL'
